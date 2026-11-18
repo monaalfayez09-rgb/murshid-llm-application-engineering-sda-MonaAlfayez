@@ -75,30 +75,32 @@ The fixture session is `demo-user-1`. `REF-1001` belongs to that user and is `un
 
 ```mermaid
 flowchart TD
-    Q["User question"] --> G{"Input accepted?"}
-    G -->|No| R["Safe refusal"]
-    G -->|Yes| T["Extract and validate ticket"]
-    T -->|Invalid| I["Reject malformed ticket"]
-    T -->|Public FAQ| C{"Public cache hit?"}
+    Q["User question + demo session"] --> C{"Exact public FAQ in cache?"}
     C -->|Yes| A["Return cached answer"]
-    C -->|No| F["FakeClient: fixed response"]
-    F --> O["Check output and cache eligible answer"]
-    O --> A
-    T -->|Application status| N{"Reference supplied?"}
-    N -->|No| CL["Ask for reference"]
-    N -->|Yes| L["Read-only status lookup"]
-    L -->|Owned by demo session| S["Return status"]
-    L -->|Missing or not owned| U["Generic unavailable response"]
+    C -->|No or not eligible| G{"Input accepted?"}
+
+    G -->|No| R["Safe refusal"]
+    G -->|Yes| T["Route request and validate ticket"]
+
+    T -->|Cancel or invalid ticket| R
+    T -->|Public FAQ| F["FakeClient: fixed response"]
+    T -->|Status without reference| CL["Ask for reference"]
+    T -->|Status with reference| L["Read-only lookup + ownership check"]
     T -->|Other service| X["Out-of-scope response"]
+
+    L -->|Owned| S["Return status"]
+    L -->|Missing or not owned| U["Generic unavailable response"]
+    F --> V["Validate response; cache eligible public answer"]
 
     classDef question fill:#dbeafe,stroke:#2563eb,color:#111827
     classDef decision fill:#fef3c7,stroke:#d97706,color:#111827
     classDef safe fill:#dcfce7,stroke:#16a34a,color:#111827
     classDef stop fill:#fee2e2,stroke:#dc2626,color:#111827
+
     class Q question
-    class G,C,N decision
-    class A,S safe
-    class R,I,U,X stop
+    class C,G decision
+    class A,F,S,V safe
+    class R,U,X stop
 ```
 
 ## 7. Tests and measured results
