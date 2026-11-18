@@ -1,70 +1,97 @@
 # Murshid Mini — Mona Alfayez
 
-### LLM Application Engineering · SDA-AIE-213
+**LLM Application Engineering · SDA-AIE-213**
 
-Build one notebook. Extend it across four days. Test and measure the result.
+Murshid Mini is my small bilingual service-assistant learning project, built in one cumulative notebook over four days. It answers selected public questions, checks fictional application status through a controlled tool, and demonstrates validation, guardrails, testing, and caching.
 
-Murshid Mini is a small bilingual service-assistant project created for the LLM Application Engineering course. It demonstrates the application work around a model-shaped interface: input validation, structured routing, a read-only tool, guardrails, regression tests, and caching. The core project uses a deterministic FakeClient (mode=mock) with fixed answers. Separate optional homework notebooks explore a real local model and related engineering exercises.
+> **What this project is:** The core runs in `mode=mock`. `FakeClient` is deterministic mock code that returns fixed responses; it is **not a trained or live language model**. This project demonstrates application engineering around a model-shaped interface. The separate Day 1 and Day 4 homework notebooks use a real local model for small experiments.
 
-## What you will build
+## 1. Problem and intended users
 
-The core assistant answers selected Arabic and English service questions and checks the status of fictional applications through a controlled, read-only lookup. It returns a trace ID and timing information, asks for missing details, refuses unsupported actions, tests expected behavior, and caches eligible public answers. All core records are synthetic.
+A service assistant must do more than produce fluent text. It needs to recognize a request, ask for missing information, control access to records, avoid unsupported actions, and show evidence that its behavior works. Murshid Mini is for learners practicing those engineering steps with safe, hand-written data. It is not a public service for real applicants.
 
-## Start here
+## 2. Scope: what it does and does not do
 
-1. Open [my cumulative Murshid notebook](notebooks/murshid_MonaAlfayez.ipynb) in Google Colab.
-2. Select a Python 3 runtime with CPU/no hardware accelerator.
-3. Run the cells from the top in order. After a runtime reset, rerun the earlier cells before continuing.
-4. Compare the printed checks with [my saved core results](results/core/) and download newly generated files from Colab before disconnecting.
+| It does | It does not |
+| --- | --- |
+| Answer a known Arabic or English service FAQ with a fixed response | Answer arbitrary service questions reliably |
+| Extract and validate a structured ticket | Use a live model in the core notebook |
+| Look up fictional application status with a demo ownership check | Authenticate real users or access real records |
+| Ask for a missing reference and refuse unsupported actions | Cancel or change an application |
+| Test expected behavior and cache eligible public answers | Cache private status answers or provide production security |
 
-The core notebook uses Python's standard library. It needs no API key, paid service, GPU, model download, or extra package installation. The optional real-model notebooks have their own setup and require internet access for packages and model weights.
+The demo identity comes from a trusted test setup, not from words in the user's question. The status tool is read-only. Missing and unauthorized records receive the same outward response to avoid revealing whether a record exists.
 
-## Four-day roadmap
+## 3. Four-day development journey
 
-| Day | What I added | My result |
+All four core stages extend [the same notebook](notebooks/murshid_MonaAlfayez.ipynb).
+
+| Day | Work added | Saved evidence |
 | --- | --- | --- |
-| 1 · Foundations | Synthetic FAQ directory, FakeClient, input checks, and a response contract | [Baseline results](results/core/baseline_results.json) |
-| 2 · Structured tools | Validated tickets, a read-only status lookup, and a demo ownership check | [Day 2 results](results/core/day2_results.json) |
-| 3 · Guardrails and tests | A controlled pipeline, input/output checks, and ten golden cases | [Day 3 results](results/core/day3_results.json) |
-| 4 · Measure and finish | A public-answer cache, regression checks, measurements, and export | [Day 4 results](results/core/day4_results.json) · [Final report](results/core/final_report.json) |
+| 1 · Foundations | Synthetic FAQ directory, `FakeClient`, `ask()`, and a response contract | [Baseline results](results/core/baseline_results.json) |
+| 2 · Structure and tools | Structured ticket, schema validation, read-only status lookup, and ownership check | [Day 2 results](results/core/day2_results.json) |
+| 3 · Guardrails and tests | Controlled pipeline, input/output checks, and ten golden cases | [Day 3 results](results/core/day3_results.json) |
+| 4 · Measure and finish | Public-answer cache, regression checks, metrics, and final export | [Day 4 results](results/core/day4_results.json) · [Final report](results/core/final_report.json) |
 
-These four stages extend the same notebook. Day 4 completes the core project.
+The optional exercises are separate notebooks: [Day 1 real model](homework/day1_real_model_MonaAlfayez.ipynb), [Day 2 tools](homework/day2_tools_MonaAlfayez.ipynb), [Day 3 errors](homework/day3_errors_MonaAlfayez.ipynb), and [Day 4 evaluation](homework/day4_evaluation_MonaAlfayez.ipynb).
 
-## How the core application works
+## 4. Environment and fresh-runtime instructions
 
-A question is validated and converted into a ticket describing its service, city, reference number, and whether clarification is needed. The ticket is checked before routing. General service questions use FakeClient to return a fixed answer. Application-status questions use a read-only lookup against synthetic records. The demo session identity is supplied separately from the question; claiming an identity in a question does not grant access. Cancellation requests are refused. Status requests are excluded from the shared public-answer cache.
+The **core** needs Python 3.9 or newer, a CPU runtime, and only Python's standard library. It needs no API key, paid API, GPU, package installation, or model download.
 
-## Data and example behavior
+1. Open [`notebooks/murshid_MonaAlfayez.ipynb`](notebooks/murshid_MonaAlfayez.ipynb) in Google Colab.
+2. Choose a Python 3 runtime with **CPU / no hardware accelerator**.
+3. Restart the runtime, then run every cell from the top in order. Later cells depend on definitions from earlier days.
+4. Check the printed assertions and results. Download generated JSON files before the Colab session ends and compare them with [the uploaded core results](results/core/).
 
-The [synthetic data file](results/core/synthetic_data.json) contains teaching fixtures, not real service records. For example, REF-1001 belongs to demo-user-1 and has status under_review; REF-1002 belongs to demo-user-2. The ownership check prevents demo-user-1 from receiving the other user's status. An application-status question without a reference asks for the reference number before any status lookup.
+Run each optional homework notebook separately using its own setup. The real-model exercises download packages and model weights and require internet access, but no paid inference API.
 
-## Tests and measured results
+## 5. Synthetic dataset and field definitions
 
-My [final report](results/core/final_report.json) records 10 of 10 selected mock cases passing. The cases include normal answers, clarification, an out-of-scope question, refusals, and malformed output. A correct refusal is a passing result when the request should be rejected.
+All examples are **hand-written synthetic teaching fixtures**, not government records or personal data. See [`synthetic_data.json`](results/core/synthetic_data.json).
 
-In the controlled cache experiment, three repeated public questions made three mock-client calls without caching and one with caching. The hit sequence was false, true, true, for a 66.7% hit rate. The core made zero external model API calls. See [additional metrics](results/core/metrics.json). Trace IDs and Python execution times can differ between runs; hypothetical cost values are examples, not billed charges.
+| Field | Meaning |
+| --- | --- |
+| `service` | Ticket category: `service_info`, `application_status`, or `other` |
+| `city` | Extracted city, or `unknown` when none is recognized |
+| `request_id` | Optional reference in the format `REF-1234` |
+| `needs_clarification` | Boolean indicating that a status request lacks a reference |
+| `owner`, `status` | Fictional record owner and application state |
 
-## Optional homework
+The fixture session is `demo-user-1`. `REF-1001` belongs to that user and is `under_review`; `REF-1002` belongs to `demo-user-2` and is `approved`. `REF-9999` is intentionally absent for a negative test. These identities are test fixtures, not real authentication.
 
-Each exercise below has its own notebook, separate from the cumulative core project.
+## 6. Example inputs and expected behavior
 
-| Day | Practice | Notebook | Saved result |
-| --- | --- | --- | --- |
-| 1 | Generate one answer with a real local model | [Real-model notebook](homework/day1_real_model_MonaAlfayez.ipynb) | [Live demo result](results/Day1/live_demo_result.json) |
-| 2 | Validate and dispatch structured tool calls | [Tools notebook](homework/day2_tools_MonaAlfayez.ipynb) | Printed in notebook |
-| 3 | Catch expected input errors and correct the input | [Errors notebook](homework/day3_errors_MonaAlfayez.ipynb) | Printed in notebook |
-| 4 | Evaluate three real-model FAQ answers | [Evaluation notebook](homework/day4_evaluation_MonaAlfayez.ipynb) | [Evaluation result](results/Day4/evaluation_result.json) |
+| Input | Expected behavior |
+| --- | --- |
+| `كيف أتابع طلبي؟` | Return the fixed Arabic answer: `يمكنك متابعة حالة طلبك باستخدام رقم المرجع.` |
+| `How can I check my application status?` | Return the fixed English answer: `You can check your application status using its reference number.` |
+| `ما حالة REF-1001؟` | For `demo-user-1`, return `under_review` through the status tool |
+| `ما حالة طلبي؟` | Ask for the reference number; make no status-tool call |
+| `ما حالة REF-1002؟` | Do not reveal another user's status |
+| `ألغ طلبي REF-1001` | Refuse the unsupported change; leave records unchanged |
 
-The Day 4 real-model report records three answers containing both “reference” and “number.” That keyword indicator is a narrow check, so each generated answer still needs manual review for meaning and unsupported claims.
+## 7. Tests and measured results
 
-## Limitations and next steps
+[The core final report](results/core/final_report.json) records **10/10 selected golden cases passing**. These include the public FAQs, authorized and unauthorized status requests, missing information, out-of-scope input, a blocked instruction, blank input, and a malformed ticket. A correct refusal counts as a pass when the request should be refused.
 
-FakeClient is a finite mapping, not a live language model. The core does not use real authentication, real application data, or a deployed service. Its guards and demo identity are teaching controls. Ten mock cases and three English real-model questions do not establish general accuracy, Arabic-language quality, or production readiness.
+In the controlled Day 4 cache experiment, three repeated public requests made **3 mock-client calls without the cache and 1 with it**. The cache-hit sequence was `false, true, true`, a **66.7% hit rate**. The core made **0 external inference API calls**. See [metrics](results/core/metrics.json) and [the final report](results/core/final_report.json). Timings and trace IDs vary between runs; illustrative cost calculations are not billed charges.
 
-A useful next step is to test more varied English and Arabic questions, including cases where the context does not support an answer, and review each response manually. A real service would also require proper authentication, privacy controls, broader evaluation, and operational testing.
+The [Day 4 real-model evaluation](homework/day4_evaluation_MonaAlfayez.ipynb) includes three questions, generated answers, tokenizer-measured token counts, execution time in seconds, and a manual review of each answer. Its [saved report](results/Day4/evaluation_result.json) shows **3/3 keyword hits**; this narrow indicator alone does not prove semantic correctness.
 
-## Course attribution
+## 8. Limitations and future improvement
 
-Created by **Mona Alfayez** for **LLM Application Engineering — SDA-AIE-213**, taught by **Meaad Al-Marri** in the **SDAIA Academy** training context.
+The core `FakeClient` only knows fixed answers. Rule-based extraction and pattern guards cover selected phrasings, not every possible question or attack. The demo ownership check is not a production authentication system. Ten mock tests and three similar English real-model questions cannot establish general accuracy, Arabic-language performance, or real-world safety.
 
-[Course learning repository](https://github.com/almiyead-rgb/murshid-llm-application-engineering-sda-aie-213) · [SDAIA Academy on GitHub](https://github.com/SDAIAAcademy)
+Next, I would test more varied English and Arabic inputs, including unsupported questions, review each generated answer for meaning and unsupported claims, and add regression cases for edge conditions. A real service would also need proper authentication, privacy controls, broader evaluation, and operational testing.
+
+## 9. Repository contents
+
+- [Core notebook](notebooks/murshid_MonaAlfayez.ipynb): the cumulative Days 1–4 implementation.
+- [Homework notebooks](homework/): four separate optional exercises.
+- [Core results](results/core/): daily JSON outputs, synthetic data, metrics, and final report.
+- [Day 1 real-model result](results/Day1/live_demo_result.json) and [Day 4 evaluation result](results/Day4/evaluation_result.json): optional homework evidence.
+
+## 10. Program and attribution
+
+Created by **Mona Alfayez as a student project** while learning **LLM Application Engineering · SDA-AIE-213**. **Meaad Al-Marri** is the course instructor. The course is delivered in the **SDAIA Academy** training context. Course materials: [Murshid Mini learning repository](https://github.com/almiyead-rgb/murshid-llm-application-engineering-sda-aie-213). [SDAIA Academy on GitHub](https://github.com/SDAIAAcademy).
